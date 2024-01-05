@@ -3,7 +3,7 @@ const router = require("express").Router();
 
 router.get("/", cutiController.findAll);
 router.post("/", cutiController.create);
-router.put("/:Nomor_Induk/:id", cutiController.update);
-router.delete("/:Nomor_Induk", cutiController.delete);
+router.put("/:id", cutiController.update);
+router.delete("/:id", cutiController.delete);
 
 module.exports = router;
