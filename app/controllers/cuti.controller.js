@@ -111,3 +111,23 @@ exports.delete = (req, res) => {
       });
   };
   
+// Menampilkan data cuti sort by Tanggal_Cuti
+  exports.findAll = (req, res) => {
+    cutiFromDb
+      .findAll({
+        order: [["Tanggal_Cuti", "ASC"]],
+      })
+      .then((cutis) => {
+        res.json({
+          message: "Cutis data sort by Tanggal Cuti retrieved successfully.",
+          data: cutis,
+        });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message:
+            err.message || "Some error occurred while retrieving cutis data sort by Tanggal Cuti.",
+          data: null,
+        });
+      });
+  };

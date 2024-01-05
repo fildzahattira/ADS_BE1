@@ -133,6 +133,7 @@ exports.findAllC = (req, res) => {
   });
 };
 
+//Menampilkan data sort ASC by Nama
 exports.findAll = (req, res) => {
   karyawanFromDb
     .findAll({
