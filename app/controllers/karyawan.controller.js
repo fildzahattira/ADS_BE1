@@ -133,7 +133,9 @@ const { QueryTypes } = require("sequelize");
 exports.findKaryawanWithCuti = async (req, res) => {
   const nomor_induk = req.params.Nomor_Induk;
 
-  const karyawan = await karyawanFromDb.findOne({ Nomor_Induk: nomor_induk });
+  const karyawan = await karyawanFromDb.findAll({
+    where: { Nomor_Induk: nomor_induk },
+  });
   const cuti = await cutiFromDb.findAll({
     where: { Nomor_Induk: nomor_induk },
   });
