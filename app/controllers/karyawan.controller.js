@@ -1,12 +1,26 @@
-const { Model } = require("sequelize");
+const sequelize = require("sequelize");
 const db = require("../models");
 const karyawanFromDb = db.karyawans;
 const cutiFromDb = db.cutis;
 
 //Mendapatkan seluruh data karyawan
 exports.findAll = (req, res) => {
+  // Parameter sorting
+  let sort;
+  if (req.query.sortBy) {
+    if (req.query.sortBy === "Nama") {
+      sort = [["Nama", "ASC"]];
+    }
+
+    if (req.query.sortBy === "Tanggal_Lahir") {
+      sort = [["Tanggal_Lahir", "ASC"]];
+    }
+  }
+
   karyawanFromDb
-    .findAll()
+    .findAll({
+      order: sort,
+    })
     .then((karyawans) => {
       res.json({
         message: "Karyawans retrieved successfully.",
@@ -116,40 +130,19 @@ exports.delete = (req, res) => {
 
 //Data karyawan dan cuti
 const { QueryTypes } = require("sequelize");
-exports.findAllC = (req, res) => {
-  const nomor_induk = req.params.nomor_induk;
-  const sql = `SELECT k.Nomor_Induk, k.Nama, k.Alamat, k.Tanggal_Lahir, k.Tanggal_Bergabung, c.* 
-                 FROM karyawan k 
-                 JOIN cuti c ON k.Nomor_Induk = c.Nomor_Induk 
-                 WHERE k.Nomor_Induk = '${nomor_induk}'`;
-  db.query(sql, (err, results) => {
-    if (err) throw err;
-    response(
-      200,
-      results,
-      `Data Karyawan dan Cuti untuk Nomor Induk ${nomor_induk}`,
-      res
-    );
-  });
-};
+exports.findKaryawanWithCuti = async (req, res) => {
+  const nomor_induk = req.params.Nomor_Induk;
 
-//Menampilkan data sort ASC by Nama
-exports.findAll = (req, res) => {
-  karyawanFromDb
-    .findAll({
-      order: [["Nama", "ASC"]], 
-    })
-    .then((karyawans) => {
-      res.json({
-        message: "Karyawans sort by name retrieved successfully.",
-        data: karyawans,
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message:
-          err.message || "Some error occurred while retrieving karyawans sort by name.",
-        data: null,
-      });
-    });
+  const karyawan = await karyawanFromDb.findOne({ Nomor_Induk: nomor_induk });
+  const cuti = await cutiFromDb.findAll({
+    where: { Nomor_Induk: nomor_induk },
+  });
+
+  res.json({
+    message: `Data Karyawan dan Cuti untuk Nomor Induk ${nomor_induk}`,
+    data: {
+      karyawan,
+      cuti,
+    },
+  });
 };
